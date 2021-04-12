@@ -20,16 +20,40 @@ router.get('/:id', checkAccountId, (req, res) => {
   res.status(200).json(req.account)
 })
 
-router.post('/', (req, res, next) => {
-  // DO YOUR MAGIC
+router.post('/', checkAccountPayload, (req, res, next) => {
+  const { name, budget } = req.body
+  Accounts.create({ name, budget })
+    .then((account) => {
+      res.status(201).json(account)
+    })
+    .catch((err) => {
+      next(err)
+    })
 })
 
-router.put('/:id', (req, res, next) => {
-  // DO YOUR MAGIC
+router.put('/:id', checkAccountPayload, (req, res, next) => {
+  const { id } = req.params
+  const changes = req.body
+
+  Accounts.updateById(id, changes)
+    .then((account) => {
+      res.status(200).json(account)
+    })
+    .catch((err) => {
+      next(err)
+    })
 })
 
 router.delete('/:id', (req, res, next) => {
-  // DO YOUR MAGIC
+  const { id } = req.params
+
+  Accounts.deleteById(id)
+    .then((account) => {
+      res.json(account)
+    })
+    .catch((err) => {
+      next(err)
+    })
 })
 
 router.use((err, req, res, next) => {
