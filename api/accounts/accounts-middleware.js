@@ -1,3 +1,5 @@
+const Account = require('../accounts/accounts-model')
+
 exports.checkAccountPayload = (req, res, next) => {
   const { name, budget } = req.body
 
@@ -13,5 +15,18 @@ exports.checkAccountNameUnique = (req, res, next) => {
 }
 
 exports.checkAccountId = (req, res, next) => {
-  // DO YOUR MAGIC
+  const { id } = req.params
+
+  Account.getById(id)
+    .then((account) => {
+      if (account) {
+        req.account = account
+        next()
+      } else {
+        res.status(404).json({ message: 'Account not found' })
+      }
+    })
+    .catch((err) => {
+      next(err)
+    })
 }
