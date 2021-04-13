@@ -20,29 +20,39 @@ router.get('/:id', checkAccountId, (req, res) => {
   res.status(200).json(req.account)
 })
 
-router.post('/', checkAccountPayload, (req, res, next) => {
-  const { name, budget } = req.body
-  Accounts.create({ name, budget })
-    .then((account) => {
-      res.status(201).json(account)
-    })
-    .catch((err) => {
-      next(err)
-    })
-})
+router.post(
+  '/',
+  checkAccountPayload,
+  checkAccountNameUnique,
+  (req, res, next) => {
+    const { name, budget } = req.body
+    Accounts.create({ name, budget })
+      .then((account) => {
+        res.status(201).json(account)
+      })
+      .catch((err) => {
+        next(err)
+      })
+  }
+)
 
-router.put('/:id', checkAccountPayload, (req, res, next) => {
-  const { id } = req.params
-  const changes = req.body
+router.put(
+  '/:id',
+  checkAccountPayload,
+  checkAccountNameUnique,
+  (req, res, next) => {
+    const { id } = req.params
+    const changes = req.body
 
-  Accounts.updateById(id, changes)
-    .then((account) => {
-      res.status(200).json(account)
-    })
-    .catch((err) => {
-      next(err)
-    })
-})
+    Accounts.updateById(id, changes)
+      .then((account) => {
+        res.status(200).json(account)
+      })
+      .catch((err) => {
+        next(err)
+      })
+  }
+)
 
 router.delete('/:id', (req, res, next) => {
   const { id } = req.params
@@ -56,8 +66,9 @@ router.delete('/:id', (req, res, next) => {
     })
 })
 
-router.use((err, req, res, next) => {
-  res.status(500).json({ message: err.message, stack: err.stack }) // eslint-disable-line
+router.use((err, req, res) => {
+  // eslint-disable-line
+  res.status(500).json({ message: err.message, stack: err.stack })
 })
 
 module.exports = router

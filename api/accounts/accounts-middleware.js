@@ -1,5 +1,4 @@
 const Account = require('../accounts/accounts-model')
-const db = require('../../data/db-config')
 
 exports.checkAccountPayload = (req, res, next) => {
   const { name, budget } = req.body
@@ -25,17 +24,17 @@ exports.checkAccountPayload = (req, res, next) => {
   }
 }
 
-exports.checkAccountNameUnique = (req, res, next) => {
-  // const { name } = req.body
-  // const trimName = name.trim()
+exports.checkAccountNameUnique = async (req, res, next) => {
+  const { name } = req.body
+  const trimName = name.trim()
 
-  const unique = db('accounts').where('name').unique()
-
-  if (!unique) {
-    res.status(404).json({ message: 'that name is taken' })
-  } else {
-    next()
-  }
+  const accountName = await Account.getAll()
+  accountName.map((account) => {
+    if (account.name === trimName) {
+      res.status(400).json({ message: 'that name is unique' })
+    }
+  })
+  next()
 }
 
 exports.checkAccountId = (req, res, next) => {
